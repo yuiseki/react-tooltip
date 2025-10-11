@@ -81,6 +81,7 @@ const TooltipController = React.forwardRef<TooltipRefProps, ITooltipController>(
     const [tooltipPositionStrategy, setTooltipPositionStrategy] = useState(positionStrategy)
     const [tooltipClassName, setTooltipClassName] = useState<string | null>(null)
     const [activeAnchor, setActiveAnchor] = useState<HTMLElement | null>(null)
+    const previousActiveAnchorRef = useRef<HTMLElement | null>(null)
     const styleInjectionRef = useRef(disableStyleInjection)
     /**
      * @todo Remove this in a future version (provider/wrapper method is deprecated)
@@ -375,7 +376,15 @@ const TooltipController = React.forwardRef<TooltipRefProps, ITooltipController>(
       afterHide,
       disableTooltip,
       activeAnchor,
-      setActiveAnchor: (anchor: HTMLElement | null) => setActiveAnchor(anchor),
+      previousActiveAnchor: previousActiveAnchorRef.current,
+      setActiveAnchor: (anchor: HTMLElement | null) => {
+        setActiveAnchor((prev) => {
+          if (!anchor?.isSameNode(prev)) {
+            previousActiveAnchorRef.current = prev
+          }
+          return anchor
+        })
+      },
       role,
     }
 
